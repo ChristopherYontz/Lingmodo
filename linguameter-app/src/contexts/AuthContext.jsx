@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import pb from "../lib/pocketbase";
+// import { isTokenExpired } from "pocketbase";
 
 const AuthContext = createContext();
 
@@ -15,7 +16,7 @@ export const AuthContextProvider = ({ children }) => {
         .collection("users")
         .authWithPassword(username, password);
       if (authData) {
-        setUser(authData.model);
+        setUser(authData.record);
         navigate("/");
       }
     } catch (error) {
@@ -26,6 +27,8 @@ export const AuthContextProvider = ({ children }) => {
   const logout = () => {
     pb.authStore.clear();
     setUser(null);
+    console.log('Here is the user object:', user)
+
     navigate("/login", {replace: true}); // Redirect to login page after logout
   };
 
@@ -43,6 +46,20 @@ export const AuthContextProvider = ({ children }) => {
     return () => AuthListener()
   }, []);
 
+  // useEffect(() => {
+  //   const AuthListener = pb.authStore.onChange((token, model) => {
+  //     if (token && model) {
+  //       if (!isTokenExpired(token)) {
+  //         setUser(model)
+  //         navigate('/')
+  //       }
+  //     } else {
+  //       setUser(null)
+  //       navigate('/login')
+  //     }
+  //   })
+  //   return () => AuthListener()
+  // }, []);
   return (
     <AuthContext.Provider value={{ user, login, logout }}>
       {children}
