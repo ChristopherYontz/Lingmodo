@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { UserAuth } from "../contexts/AuthContext";
-import LogCard from "../components/LogCard";
+// import LogCard from "../components/LogCard";
 import LogSubmissionForm from "../components/LogSubmissionForm";
 import pb from "../lib/pocketbase";
 
@@ -17,15 +17,18 @@ export default function DashboardPage() {
         .getFullList({
           filter: `created_by="${user.id}"`,
           sort: "-created",
+          expand: 'created_by',
         });
       setUserLogs(records);
+      console.log(records)
     } catch (error) {
-      console.error("Error fetching logs:", error);
+      console.error("Errors fetching logs:", error);
     }
   };
 
   useEffect(() => {
     getUserLogs();
+    console.log('yuh')
   }, []);
 
   return (
@@ -37,8 +40,8 @@ export default function DashboardPage() {
           <div key={log.id} className="card w-96 shadow-xl bg-green-500">
             <div className="card-body">
               <div className="flex flex-row justify-around">
-                <h2 className="card-title">@{log.activity}</h2>
-                <span>{log.date}</span>
+                <h2 className="card-title">@{log.expand.created_by.username}</h2>
+                <span>{log.date.slice(0, 10)}</span>
               </div>
               <div className="card w-full bg-white">
                 <div className="card-body">

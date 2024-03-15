@@ -1,4 +1,10 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import pb from "../lib/pocketbase";
 // import { isTokenExpired } from "pocketbase";
@@ -8,60 +14,54 @@ const AuthContext = createContext();
 export const AuthContextProvider = ({ children }) => {
   const navigate = useNavigate();
 
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(pb.authStore.model);
 
-  const login = async (username, password) => {
+  const register = useCallback(async (email, password) => {
+    return await pb
+      .collection("users")
+      .create({ email, password, passwordConfirm: password });
+  }, []);
+
+  const login = useCallback(async (email, password) => {
     try {
       const authData = await pb
         .collection("users")
-        .authWithPassword(username, password);
+        .authWithPassword(email, password);
       if (authData) {
         setUser(authData.record);
+        console.log("logging in");
         navigate("/");
       }
     } catch (error) {
       console.error("Error authenticating:", error);
     }
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     pb.authStore.clear();
-    setUser(null);
-    console.log('Here is the user object:', user)
+    navigate("/login", {replace: true})
+  }, []);
 
-    navigate("/login", {replace: true}); // Redirect to login page after logout
-  };
+  // useEffect(() => {
+  //   return pb.authStore.onChange((token, model) => {
+  //     setUser(model);
+  //   });
+  // }, []);
 
   useEffect(() => {
     const AuthListener = pb.authStore.onChange((token, model) => {
-      if (token && model) {
-        setUser(model)
-        console.log('Here is the user object:', user)
-        navigate('/')
+      if (pb.authStore.isValid) {
+          setUser(model)
+          navigate('/')
       } else {
-        setUser(null)
+        setUser(pb.authStore.model)
         navigate('/login')
       }
     })
     return () => AuthListener()
   }, []);
-
-  // useEffect(() => {
-  //   const AuthListener = pb.authStore.onChange((token, model) => {
-  //     if (token && model) {
-  //       if (!isTokenExpired(token)) {
-  //         setUser(model)
-  //         navigate('/')
-  //       }
-  //     } else {
-  //       setUser(null)
-  //       navigate('/login')
-  //     }
-  //   })
-  //   return () => AuthListener()
-  // }, []);
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, register }}>
       {children}
     </AuthContext.Provider>
   );
