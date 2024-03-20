@@ -1,3 +1,124 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* @font-face {
+    font-family: inter, sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-optical-sizing: auto;
+    src: url(https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap);
+} */
+
+/* .inter-400 {
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-variation-settings:
+      "slnt" 0;
+  } */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+html {
+  overscroll-behavior: none;
+  scrollbar-color: #0000 #0000;
+}
+body {
+  /* font-family: fabel; */
+  background-color: #eee;
+}
+a {
+  text-decoration: none;
+  color: #666;
+}
+#menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 24lvh;
+  height: 100lvh;
+  background-color: #fff;
+  /* border-right: 0.2lvh solid #fff; */
+}
+
+#layout {
+  width: 100%;
+  box-sizing: border-box;
+  display: grid;
+  gap: 2lvh;
+  padding-right: 2lvh;
+  background-color: #eee;
+  grid-template-rows: 1fr;
+  grid-template-columns: 24lvh 1fr 1fr;
+}
+.spacer {
+  display: block;
+  width: 100%;
+}
+.content {
+  height: 100lvh;
+  padding: 2lvh 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  /* gap: 2lvh; */
+}
+.content-left {
+    padding-left: 4lvh;
+  }
+  .content-right {
+    padding-right: 4lvh;
+  }
+.card-tile {
+  box-sizing: border-box;
+  width: 100%;
+  border-radius: 2lvh;
+  min-height: 20lvh;
+  /* display: grid;
+  row-gap: 0px; */
+}
+.card-tile-head {
+  height: 8lvh;
+  border-radius: 1.82lvh 1.82lvh 0 0;
+  display: grid;
+  grid-template-columns: min-content min-content 1fr min-content;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2lvh;
+  gap: 2lvh;
+  box-sizing: border-box;
+}
+.profile {
+  border: 0.3lvh solid #fff;
+  background-color: #0001;
+  height: 6lvh;
+  aspect-ratio: 1 / 1;
+  border-radius: 100%;
+}
+.card-tile-body {
+  padding: 2lvh 4lvh;
+  border-radius: 0 0 1.82lvh 1.82lvh;
+}
+@media (max-aspect-ratio: 1/1) {
+  #layout {
+    grid-template-rows: min-content min-content;
+    grid-template-columns: 1fr;
+    padding: 2lvh;
+    gap: 0;
+  }
+  .spacer {
+    dipslay: none;
+  }
+  #menu {
+    top: 84lvh;
+    left: 0;
+    width: 100vw;
+    height: 16lvh;
+    border-top: 0.2lvh solid #fff;
+  }
+}
