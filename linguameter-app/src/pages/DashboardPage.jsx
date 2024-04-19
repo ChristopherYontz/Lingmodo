@@ -32,8 +32,8 @@ export default function DashboardPage() {
         sort: "-created",
         expand: "created_by",
       });
+      console.log('here are the stupid records:', records);
       return records;
-      // console.log(records);
     } catch (error) {
       console.error("Error fetching logs:", error);
     }
@@ -85,8 +85,6 @@ export default function DashboardPage() {
 
       let allMembers = [];
 
-      let count = 0;
-
       for (const groupID of groups) {
         const groupMembers = (
           await pb.collection("group_members").getFullList({
@@ -106,14 +104,10 @@ export default function DashboardPage() {
       for (const member of allMembers) {
         const memberLogs = await getLogs(member);
         newLogs = [...newLogs, ...memberLogs];
-        if (count === allMembers.length) {
-          setUserLogs(newLogs);
-          console.log("here are the updated logs:", userLogs);
-        }
       }
-      // setUserLogs(newLogs);
+      setUserLogs(newLogs);
       console.log("here are all members:", allMembers);
-      console.log("here are the user logs", newLogs);
+      console.log("here are the user logs", userLogs);
     } catch (error) {
       console.error("Error fetching logs:", error);
     }
@@ -123,8 +117,6 @@ export default function DashboardPage() {
   useEffect(() => {
     getUserLogs();
   }, []);
-
-  useEffect(() => {}, [userLogs]);
 
   const refreshUserLogs = () => {
     getUserLogs();
@@ -253,12 +245,8 @@ export default function DashboardPage() {
                     <div id="logs-wrapper">
                       <div id="logs">
                         {/* <div className="test-space"></div> */}
-                        {userLogs !== undefined ? (
+                        {userLogs.length > 0 ? (
                           userLogs.map((log) => {
-                            console.log(
-                              `rendering logs for ${log.created_by}:`,
-                              log
-                            );
                             return (
                               <div key={log.id} className="card-tile">
                                 <div className="card-tile-head bg-primary-color-1">
