@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { UserAuth } from "../contexts/AuthContext";
-// import LogCard from "../components/LogCard";
-// import LogSubmissionForm from "../components/LogSubmissionForm";
 import pb from "../lib/pocketbase";
+import Modal from "../components/Modal";
+import MyResponsiveLine from "../components/charts/LineChart";
 
 export default function DashboardPage() {
   const { user, logout } = UserAuth();
   const [userLogs, setUserLogs] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
 
-  console.log(user.id);
+  // console.log(user.id);
 
   const getUserLogs = async () => {
     try {
@@ -18,225 +19,302 @@ export default function DashboardPage() {
         expand: "created_by",
       });
       setUserLogs(records);
-      console.log(records);
+      console.log("here are the initial logs:", records);
     } catch (error) {
-      console.error("Errors fetching logs:", error);
+      console.error("Error fetching logs:", error);
     }
   };
 
+  const getLogs = async (userID) => {
+    try {
+      const records = await pb.collection("logs").getFullList({
+        filter: `created_by="${userID}"`,
+        sort: "-created",
+        expand: "created_by",
+      });
+      return records;
+      // console.log(records);
+    } catch (error) {
+      console.error("Error fetching logs:", error);
+    }
+    return [];
+  };
+
+  // const getGroupLogs = async () => {
+  //   try {
+  //     const groups = (await pb.collection("group_members").getFullList({
+  //       filter: `member="${user.id}"`,
+  //       expand: 'member',
+  //       sort: "-created",
+  //     })).map(group => group.group_joined)
+
+  //     // const group_IDs = groups.map(group => group.group_joined)
+  //     console.log('here are the group IDs:', groups)
+
+  //     const group_members = (await pb.collection("group_members").getFullList({
+  //       filter: groups.map(id => `group_joined="${id}"`).join('||'),
+  //       expand: 'group_joined',
+  //     })).map(member => member.member)
+  //     console.log(group_members)
+
+  //     group_members.forEach(member => {
+  //       const memberLogs = getLogs(member)
+  //       console.log(memberLogs)
+  //       // setUserLogs(prevLogs => [...prevLogs, memberLogs])
+  //     })
+
+  //     // console.log(userLogs)
+  //   } catch (error) {
+  //     console.error("Error fetching logs:", error)
+  //   }
+  // }
+
+  const getGroupLogs = async () => {
+    try {
+      const groups = (
+        await pb.collection("group_members").getFullList({
+          filter: `member="${user.id}"`,
+          expand: "member",
+          sort: "-created",
+        })
+      ).map((group) => group.group_joined);
+
+      console.log("here are the group ids:", groups);
+
+      let newLogs = [];
+
+      let allMembers = [];
+
+      let count = 0;
+
+      for (const groupID of groups) {
+        const groupMembers = (
+          await pb.collection("group_members").getFullList({
+            filter: `group_joined="${groupID}"`,
+            expand: "group_joined",
+          })
+        ).map((member) => member.member);
+        for (const member of groupMembers) {
+          if (!allMembers.includes(member)) {
+            allMembers.push(member);
+          }
+        }
+
+        console.log("here are the members:", groupMembers);
+      }
+
+      for (const member of allMembers) {
+        const memberLogs = await getLogs(member);
+        newLogs = [...newLogs, ...memberLogs];
+        if (count === allMembers.length) {
+          setUserLogs(newLogs);
+          console.log("here are the updated logs:", userLogs);
+        }
+      }
+      // setUserLogs(newLogs);
+      console.log("here are all members:", allMembers);
+      console.log("here are the user logs", newLogs);
+    } catch (error) {
+      console.error("Error fetching logs:", error);
+    }
+  };
+
+
   useEffect(() => {
     getUserLogs();
-    console.log("yuh");
   }, []);
 
-  return (
-    // <div className="h-screen flex items-center justify-center flex-col bg-gray-bg">
-    //   <h1>{`Welcome, ${user.name}`}</h1>
-    //   <LogCard />
-    //   {userLogs.map((log) => {
-    //     return (
-    //       <div key={log.id} className="card w-96 shadow-xl bg-green-500">
-    //         <div className="card-body">
-    //           <div className="flex flex-row justify-around">
-    //             <h2 className="card-title">@{log.expand.created_by.username}</h2>
-    //             <span>{log.date.slice(0, 10)}</span>
-    //           </div>
-    //           <div className="card w-full bg-white">
-    //             <div className="card-body">
-    //               <h2 className="card-title">{log.activity}</h2>
-    //               <span>{log.duration}</span>
-    //             </div>
-    //           </div>
-    //         </div>
-    //       </div>
-    //     );
-    //   })}
-    //   <button className="btn" onClick={logout}>
-    //     Sign Out
-    //   </button>
-    //   <LogSubmissionForm />
-    // </div>
-    // <div className="body-container h-lvh bg-gray-bg">
-    //   <div className="navbar-container h-lvh w-[16rem] top-0 left-0 bg-white fixed flex flex-col items-center">
-    //     <div className="navbar-top-container">
-    //       <img src="#" alt="Linguameter Logo" />
-    //       <h3>Linguameter</h3>
-    //     </div>
-    //     <div className="nav-options-container flex flex-col items-center">
-    //       <ul>
-    //         <li>Home</li>
-    //         <li>Community</li>
-    //         <li>Progress</li>
-    //         <li>Lists</li>
-    //         <li>Add Log</li>
-    //       </ul>
-    //     </div>
-    //     <div className="daily-goal-container">
-    //       <div className="daily-goal-top">
-    //         <h3>Daily goal</h3>
-    //         <span>Language</span>
-    //         <span>160m / 200m</span>
-    //       </div>
-    //       <div className="daily-goal-bottom">
-    //         <span>Graph</span>
-    //       </div>
-    //     </div>
-    //     <div className="navbar-bottom-container">
-    //       <span>Profile</span>
-    //     </div>
-    //   </div>
-    //   <div className="column-container flex flex-wrap flex-1">
-    //     <div className="navbar-padding w-[16rem]">
-    //       <span>Navbar padding</span>
-    //     </div>
-    //     <div className="column-1-2-container flex flex-wrap flex-1 space-x-8 mx-8 h-lvh">
-    //       <div className="column-1-container bg-white flex-1 rounded-[1rem]">
-    //         <div className="stats-container flex items-center flex-col">
-    //           <span>column 1</span>
-    //           <LogCard />
-    //         </div>
-    //       </div>
-    //       <div className="column-2-container bg-white flex-1 rounded-[1rem]">
-    //         <div className="posts-container flex items-center flex-col">
-    //           <span>column 2</span>
-    // {userLogs.map((log) => {
-    //   return (
-    //     <div
-    //       key={log.id}
-    //       className="card w-96 shadow-xl bg-green-primary mb-6"
-    //     >
-    //       <div className="card-body">
-    //         <div className="flex flex-row justify-around items-center">
-    //           <div className="flex flex-row">
-    //             <div className="w-[2.688rem] h-[2.688rem] rounded-full">
-    //               <img
-    //                 className="rounded-full"
-    //                 src={`http://127.0.0.1:8090/api/files/users/${log.expand.created_by.id}/${log.expand.created_by.avatar}`}
-    //                 alt="Profile Picture"
-    //               />
-    //             </div>
-    //             <h2 className="card-title">
-    //               @{log.expand.created_by.username}
-    //             </h2>
-    //           </div>
-    //           <span>{log.date.slice(0, 10)}</span>
-    //         </div>
-    //         <div className="card w-full bg-white">
-    //           <div className="card-body">
-    //             <h2 className="card-title">{log.activity}</h2>
-    //             <span>{log.duration}</span>
-    //           </div>
-    //         </div>
-    //       </div>
-    //     </div>
-    //   );
-    // })}
-    //           <button className="btn" onClick={logout}>
-    //             Sign Out
-    //           </button>
-    //         </div>
-    //       </div>
-    //     </div>
-    //   </div>
-    // </div>
+  useEffect(() => {}, [userLogs]);
 
-    // NEW LAYOUT
-    <div id="app" className="font-inter">
-      {/* {userLogs.map((log) => {
-        return (
-          <div
-            key={log.id}
-            className="card w-96 shadow-xl bg-green-primary mb-6"
-          >
-            <div className="card-body">
-              <div className="flex flex-row justify-around items-center">
-                <div className="flex flex-row">
-                  <div className="w-[2.688rem] h-[2.688rem] rounded-full">
-                    <img
-                      className="rounded-full"
-                      src={`http://127.0.0.1:8090/api/files/users/${log.expand.created_by.id}/${log.expand.created_by.avatar}`}
-                      alt="Profile Picture"
-                    />
-                  </div>
-                  <h2 className="card-title">
-                    @{log.expand.created_by.username}
-                  </h2>
+  const refreshUserLogs = () => {
+    getUserLogs();
+  };
+
+  return (
+    // NEW NEW LAYOUT
+    <div id="wrapper" className="inter-regular">
+      <div id="navbar-wrapper">
+        <div id="navbar">
+          <div id="navbar-top" className="inter-bold">
+            <img src="/temp-logo.png" alt="Temp Logo" />
+            <h3>Lingmodo</h3>
+          </div>
+          <div id="navbar-middle">
+            <ul id="navbar-options" className="inter-semi-bold">
+              <li>
+                <div className="navbar-option">
+                  <img src="/home-green.svg" alt="Home Icon" />
+                  <h3 id="selected-page">Home</h3>
                 </div>
-                <span>{log.date.slice(0, 10)}</span>
+              </li>
+              <li>
+                <div className="navbar-option">
+                  <img src="/community-gray.svg" alt="Community Icon" />
+                  <h3>Community</h3>
+                </div>
+              </li>
+              <li>
+                <div className="navbar-option">
+                  <img src="/progress-gray.svg" alt="Progress Icon" />
+                  <h3>Progress</h3>
+                </div>
+              </li>
+              <li>
+                <div className="navbar-option">
+                  <img src="/lists-gray.svg" alt="Lists Icon" />
+                  <h3>Lists</h3>
+                </div>
+              </li>
+              <li>
+                <div className="navbar-option">
+                  <img src="/add-log.svg" alt="Add Log Icon" />
+                  <button
+                    className="openModalBtn"
+                    onClick={() => {
+                      setModalOpen(true);
+                    }}
+                  >
+                    Add Entry
+                  </button>
+                </div>
+              </li>
+              <li>
+                <div className="navbar-option">
+                  <button
+                    className=""
+                    onClick={() => {
+                      logout();
+                    }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              </li>
+            </ul>
+            <div id="navbar-goal">
+              <div id="navbar-goal-top">
+                <h4>Daily goal</h4>
+                <span>Spanish</span>
+                <span>160m / 200m</span>
               </div>
-              <div className="card w-full bg-white">
-                <div className="card-body">
-                  <h2 className="card-title">{log.activity}</h2>
-                  <span>{log.duration}</span>
+              <div id="navbar-goal-bottom">
+                <img src="" alt="placeholder" />
+              </div>
+            </div>
+          </div>
+          <div id="navbar-bottom" className="inter-semi-bold">
+            <img src="/profile.svg" alt="User Icon" />
+            <h3>Profile</h3>
+            <img id="profile-arrow" src="/chevron-right.svg" alt="Arrow Icon" />
+          </div>
+        </div>
+      </div>
+      <div id="main-wrapper">
+        {modalOpen && (
+          <Modal
+            setOpenModal={setModalOpen}
+            userID={user.id}
+            pb={pb}
+            refreshUserLogs={refreshUserLogs}
+          />
+        )}
+
+        <div id="navbar-spacer"></div>
+        <div id="content-wrapper">
+          <div id="content">
+            <div id="top-bar-wrapper">
+              <div id="top-bar"></div>
+            </div>
+            <div id="column-wrapper">
+              <div id="columns">
+                <div id="left-column-wrapper">
+                  <div id="left-column">
+                    {/* <div className="test-space"></div> */}
+                    <MyResponsiveLine />
+                  </div>
+                </div>
+                <div id="right-column-wrapper">
+                  <div id="right-column">
+                    <div id="filter-wrapper">
+                      <div id="filter">
+                        <div id="filter-options-top">
+                          <button>All Logs</button>
+                          <button
+                            onClick={() => {
+                              getGroupLogs();
+                            }}
+                          >
+                            My Groups
+                          </button>
+                        </div>
+                        <div id="filter-options-bottom"></div>
+                      </div>
+                    </div>
+                    <div id="logs-wrapper">
+                      <div id="logs">
+                        {/* <div className="test-space"></div> */}
+                        {userLogs !== undefined ? (
+                          userLogs.map((log) => {
+                            console.log(
+                              `rendering logs for ${log.created_by}:`,
+                              log
+                            );
+                            return (
+                              <div key={log.id} className="card-tile">
+                                <div className="card-tile-head bg-primary-color-1">
+                                  <div className="profile">
+                                    <img
+                                      className="rounded-full"
+                                      src={`http://127.0.0.1:8090/api/files/users/${log.expand.created_by.id}/${log.expand.created_by.avatar}`}
+                                      alt="Profile Picture"
+                                    />
+                                  </div>
+                                  <div>
+                                    <h4 className="text-utility-color-1 text-top inter-medium">
+                                      @{log.expand.created_by.username}
+                                    </h4>
+                                  </div>
+                                  <div className="spacer"></div>
+                                  <div className="text-utility-color-1">
+                                    {log.date.slice(0, 10)}
+                                  </div>
+                                </div>
+
+                                <div className="card-tile-body bg-white">
+                                  <h2 className="card-title text-utility-color-2 inter-bold mb-1">
+                                    {log.activity}
+                                  </h2>
+                                  <div className="grid grid-cols-3 justify-bewteen text-utility-color-3 font-semibold">
+                                    <div className="flex flex-row gap-x-1 justify-start">
+                                      <img className="w-5" src="/clock.svg" />
+                                      <span>{log.duration} minutes</span>
+                                    </div>
+                                    <div className="flex flex-row gap-x-1 justify-center">
+                                      <img
+                                        className="w-5"
+                                        src="/volume-1.svg"
+                                      />
+                                      <span>{log.activity_type}</span>
+                                    </div>
+                                    <div className="flex flex-row gap-x-1 justify-end">
+                                      <img className="w-5" src="/clock.svg" />
+                                      <span>{log.language}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <h1>No logs found.</h1>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        );
-      })} */}
-      <div id="menu">cat</div>
-
-      <div id="layout">
-        <div className="spacer"></div>
-        <div className="content content-left">
-          {userLogs.map((log) => {
-            return (
-              <div key={log.id} className="card-tile">
-                <div className="card-tile-head bg-green-primary">
-                  <div className="profile">
-                    <img
-                      className="rounded-full"
-                      src={`http://127.0.0.1:8090/api/files/users/${log.expand.created_by.id}/${log.expand.created_by.avatar}`}
-                      alt="Profile Picture"
-                    />
-                  </div>
-                  <div>@{log.expand.created_by.username}</div>
-                  <div className="spacer"></div>
-                  <div>{log.date.slice(0, 10)}</div>
-                </div>
-
-                <div class="card-tile-body bg-white">
-                  <h2 className="card-title">{log.activity}</h2>
-                  <div className="grid grid-cols-3 justify-bewteen">
-                    <span className="text-start">{log.duration} minutes</span>
-                    <span className="text-center">{log.activity_type}</span>
-
-                    <span className="text-end">{log.language}</span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <div className="content content-right">
-          {userLogs.map((log) => {
-            return (
-              <div key={log.id} className="card-tile">
-                <div className="card-tile-head bg-green-primary">
-                  <div className="profile">
-                    <img
-                      className="rounded-full"
-                      src={`http://127.0.0.1:8090/api/files/users/${log.expand.created_by.id}/${log.expand.created_by.avatar}`}
-                      alt="Profile Picture"
-                    />
-                  </div>
-                  <div>@{log.expand.created_by.username}</div>
-                  <div className="spacer"></div>
-                  <div>{log.date.slice(0, 10)}</div>
-                </div>
-
-                <div class="card-tile-body bg-white">
-                  <h2 className="card-title text-black font-semibold">{log.activity}</h2>
-                  <div className="grid grid-cols-3 justify-bewteen">
-                    <span className="text-start">{log.duration} minutes</span>
-                    <span className="text-center">{log.activity_type}</span>
-
-                    <span className="text-end">{log.language}</span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
         </div>
       </div>
     </div>
