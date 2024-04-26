@@ -1,351 +1,124 @@
 // install (please try to align the version of installed @nivo packages)
 // yarn add @nivo/line
-import { ResponsiveLine } from '@nivo/line'
+import { ResponsiveLine } from "@nivo/line";
+// import pb from "../../lib/pocketbase";
+// import { UserAuth } from "../../contexts/AuthContext";
+// import React, { useEffect, useState } from "react";
+import React from "react";
 
 // make sure parent container have a defined height when using
 // responsive component, otherwise height will be 0 and
 // no chart will be rendered.
 // website examples showcase many properties,
 // you'll often use just a few of them.
-const MyResponsiveLine = () => (
+const MyResponsiveLine = () => {
+  // const { user } = UserAuth();
+  // const [data, setData] = useState([]);
+
+  // const fetchData = async () => {
+  //   try {
+  //     const sevenDaysAgo = new Date();
+  //     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  //     const dates = sevenDaysAgo.toISOString().slice(0, 10) + " 12:00:00.000Z";
+  //     console.log("here is 7 days ago:", dates);
+
+  //     const records = await pb.collection("logs").getFullList({
+  //       filter: `created_by="${user.id}"`,
+  //       expand: "created_by",
+  //     });
+  //     console.log("here is the graph data:", records);
+  //     setData(records);
+  //   } catch (error) {
+  //     console.error("Error fetching graph data:", error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchData();
+  // }, []);
+  console.log("loading graph");
+  return (
     <ResponsiveLine
-        data={[
+    colors={() => '#0090FF'}
+    areaOpacity={0.2}
+      data={[
+        {
+          id: "japan",
+          // color: "#61cdbb",
+          data: [
             {
-              "id": "japan",
-              "color": "hsl(155, 70%, 50%)",
-              "data": [
-                {
-                  "x": "plane",
-                  "y": 2
-                },
-                {
-                  "x": "helicopter",
-                  "y": 270
-                },
-                {
-                  "x": "boat",
-                  "y": 73
-                },
-                {
-                  "x": "train",
-                  "y": 21
-                },
-                {
-                  "x": "subway",
-                  "y": 130
-                },
-                {
-                  "x": "bus",
-                  "y": 128
-                },
-                {
-                  "x": "car",
-                  "y": 268
-                },
-                {
-                  "x": "moto",
-                  "y": 173
-                },
-                {
-                  "x": "bicycle",
-                  "y": 149
-                },
-                {
-                  "x": "horse",
-                  "y": 120
-                },
-                {
-                  "x": "skateboard",
-                  "y": 189
-                },
-                {
-                  "x": "others",
-                  "y": 220
-                }
-              ]
+              x: "day 1",
+              y: 2,
             },
             {
-              "id": "france",
-              "color": "hsl(296, 70%, 50%)",
-              "data": [
-                {
-                  "x": "plane",
-                  "y": 259
-                },
-                {
-                  "x": "helicopter",
-                  "y": 111
-                },
-                {
-                  "x": "boat",
-                  "y": 184
-                },
-                {
-                  "x": "train",
-                  "y": 37
-                },
-                {
-                  "x": "subway",
-                  "y": 37
-                },
-                {
-                  "x": "bus",
-                  "y": 118
-                },
-                {
-                  "x": "car",
-                  "y": 157
-                },
-                {
-                  "x": "moto",
-                  "y": 290
-                },
-                {
-                  "x": "bicycle",
-                  "y": 299
-                },
-                {
-                  "x": "horse",
-                  "y": 30
-                },
-                {
-                  "x": "skateboard",
-                  "y": 294
-                },
-                {
-                  "x": "others",
-                  "y": 291
-                }
-              ]
+              x: "day 2",
+              y: 270,
             },
             {
-              "id": "us",
-              "color": "hsl(353, 70%, 50%)",
-              "data": [
-                {
-                  "x": "plane",
-                  "y": 5
-                },
-                {
-                  "x": "helicopter",
-                  "y": 128
-                },
-                {
-                  "x": "boat",
-                  "y": 258
-                },
-                {
-                  "x": "train",
-                  "y": 220
-                },
-                {
-                  "x": "subway",
-                  "y": 113
-                },
-                {
-                  "x": "bus",
-                  "y": 172
-                },
-                {
-                  "x": "car",
-                  "y": 223
-                },
-                {
-                  "x": "moto",
-                  "y": 245
-                },
-                {
-                  "x": "bicycle",
-                  "y": 269
-                },
-                {
-                  "x": "horse",
-                  "y": 124
-                },
-                {
-                  "x": "skateboard",
-                  "y": 184
-                },
-                {
-                  "x": "others",
-                  "y": 53
-                }
-              ]
+              x: "day 3",
+              y: 73,
             },
             {
-              "id": "germany",
-              "color": "hsl(68, 70%, 50%)",
-              "data": [
-                {
-                  "x": "plane",
-                  "y": 169
-                },
-                {
-                  "x": "helicopter",
-                  "y": 199
-                },
-                {
-                  "x": "boat",
-                  "y": 14
-                },
-                {
-                  "x": "train",
-                  "y": 168
-                },
-                {
-                  "x": "subway",
-                  "y": 106
-                },
-                {
-                  "x": "bus",
-                  "y": 225
-                },
-                {
-                  "x": "car",
-                  "y": 95
-                },
-                {
-                  "x": "moto",
-                  "y": 217
-                },
-                {
-                  "x": "bicycle",
-                  "y": 37
-                },
-                {
-                  "x": "horse",
-                  "y": 119
-                },
-                {
-                  "x": "skateboard",
-                  "y": 9
-                },
-                {
-                  "x": "others",
-                  "y": 151
-                }
-              ]
+              x: "day 4",
+              y: 21,
             },
             {
-              "id": "norway",
-              "color": "hsl(153, 70%, 50%)",
-              "data": [
-                {
-                  "x": "plane",
-                  "y": 150
-                },
-                {
-                  "x": "helicopter",
-                  "y": 27
-                },
-                {
-                  "x": "boat",
-                  "y": 139
-                },
-                {
-                  "x": "train",
-                  "y": 276
-                },
-                {
-                  "x": "subway",
-                  "y": 113
-                },
-                {
-                  "x": "bus",
-                  "y": 110
-                },
-                {
-                  "x": "car",
-                  "y": 295
-                },
-                {
-                  "x": "moto",
-                  "y": 171
-                },
-                {
-                  "x": "bicycle",
-                  "y": 70
-                },
-                {
-                  "x": "horse",
-                  "y": 252
-                },
-                {
-                  "x": "skateboard",
-                  "y": 233
-                },
-                {
-                  "x": "others",
-                  "y": 248
-                }
-              ]
-            }
-          ]}
-        margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
-        xScale={{ type: 'point' }}
-        yScale={{
-            type: 'linear',
-            min: 'auto',
-            max: 'auto',
-            stacked: true,
-            reverse: false
-        }}
-        yFormat=" >-.2f"
-        axisTop={null}
-        axisRight={null}
-        axisBottom={{
-            tickSize: 5,
-            tickPadding: 5,
-            tickRotation: 0,
-            legend: 'transportation',
-            legendOffset: 36,
-            legendPosition: 'middle',
-            truncateTickAt: 0
-        }}
-        axisLeft={{
-            tickSize: 5,
-            tickPadding: 5,
-            tickRotation: 0,
-            legend: 'count',
-            legendOffset: -40,
-            legendPosition: 'middle',
-            truncateTickAt: 0
-        }}
-        colors={{ scheme: 'nivo' }}
-        pointSize={10}
-        pointColor={{ theme: 'background' }}
-        pointBorderWidth={2}
-        pointBorderColor={{ from: 'serieColor' }}
-        pointLabelYOffset={-12}
-        enableTouchCrosshair={true}
-        useMesh={true}
-        legends={[
+              x: "day 5",
+              y: 130,
+            },
             {
-                anchor: 'bottom-right',
-                direction: 'column',
-                justify: false,
-                translateX: 100,
-                translateY: 0,
-                itemsSpacing: 0,
-                itemDirection: 'left-to-right',
-                itemWidth: 80,
-                itemHeight: 20,
-                itemOpacity: 0.75,
-                symbolSize: 12,
-                symbolShape: 'circle',
-                symbolBorderColor: 'rgba(0, 0, 0, .5)',
-                effects: [
-                    {
-                        on: 'hover',
-                        style: {
-                            itemBackground: 'rgba(0, 0, 0, .03)',
-                            itemOpacity: 1
-                        }
-                    }
-                ]
-            }
-        ]}
+              x: "day 6",
+              y: 128,
+            },
+            {
+              x: "day 7",
+              y: 268,
+            },
+          ],
+        },
+      ]}
+      // data={data}
+      margin={{ top: 10, right: 30, bottom: 50, left: 50 }}
+      xScale={{ type: "point" }}
+      yScale={{
+        type: "linear",
+        min: "auto",
+        max: "auto",
+        stacked: true,
+        reverse: false,
+      }}
+      yFormat=" >-.2f"
+      curve="monotoneX"
+      axisTop={null}
+      axisRight={null}
+      axisBottom={{
+        tickSize: 5,
+        tickPadding: 5,
+        tickRotation: 0,
+        legend: "transportation",
+        legendOffset: 36,
+        legendPosition: "middle",
+        truncateTickAt: 0,
+      }}
+      axisLeft={{
+        tickSize: 5,
+        tickPadding: 5,
+        tickRotation: 0,
+        legend: "count",
+        legendOffset: -40,
+        legendPosition: "middle",
+        truncateTickAt: 0,
+      }}
+      pointSize={10}
+      pointColor={{ theme: "background" }}
+      pointBorderWidth={2}
+      pointBorderColor={{ from: "serieColor" }}
+      pointLabelYOffset={-12}
+      enableArea={true}
+      enableTouchCrosshair={true}
+      useMesh={true}
     />
-)
+  );
+};
 
 export default MyResponsiveLine;

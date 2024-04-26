@@ -15,7 +15,7 @@ export default function DashboardPage() {
     try {
       const records = await pb.collection("logs").getFullList({
         filter: `created_by="${user.id}"`,
-        sort: "-created",
+        sort: "-date",
         expand: "created_by",
       });
       setUserLogs(records);
