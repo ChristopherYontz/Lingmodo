@@ -11,7 +11,7 @@ import React from "react";
 // no chart will be rendered.
 // website examples showcase many properties,
 // you'll often use just a few of them.
-const MyResponsiveLine = () => {
+const MyResponsiveLine = ({graphData}) => {
   // const { user } = UserAuth();
   // const [data, setData] = useState([]);
 
@@ -39,42 +39,13 @@ const MyResponsiveLine = () => {
   console.log("loading graph");
   return (
     <ResponsiveLine
-    colors={() => '#0090FF'}
-    areaOpacity={0.2}
+      colors={() => "#0090FF"}
+      areaOpacity={0.2}
       data={[
         {
-          id: "japan",
+          id: "ThisWeek",
           // color: "#61cdbb",
-          data: [
-            {
-              x: "day 1",
-              y: 2,
-            },
-            {
-              x: "day 2",
-              y: 270,
-            },
-            {
-              x: "day 3",
-              y: 73,
-            },
-            {
-              x: "day 4",
-              y: 21,
-            },
-            {
-              x: "day 5",
-              y: 130,
-            },
-            {
-              x: "day 6",
-              y: 128,
-            },
-            {
-              x: "day 7",
-              y: 268,
-            },
-          ],
+          data: graphData,
         },
       ]}
       // data={data}
@@ -95,7 +66,7 @@ const MyResponsiveLine = () => {
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        legend: "transportation",
+        legend: "Date",
         legendOffset: 36,
         legendPosition: "middle",
         truncateTickAt: 0,
@@ -104,7 +75,7 @@ const MyResponsiveLine = () => {
         tickSize: 5,
         tickPadding: 5,
         tickRotation: 0,
-        legend: "count",
+        legend: "Minutes",
         legendOffset: -40,
         legendPosition: "middle",
         truncateTickAt: 0,

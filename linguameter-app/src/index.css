@@ -587,6 +587,7 @@ img#profile-arrow {
   justify-content: center;
   align-items: center;
   padding-left: 30lvh;
+  z-index: 999;
 }
 
 .modalContainer {

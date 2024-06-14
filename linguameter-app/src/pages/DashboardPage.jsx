@@ -8,14 +8,14 @@ export default function DashboardPage() {
   const { user, logout } = UserAuth();
   const [userLogs, setUserLogs] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const [graphData, setGraphData] = useState([]);
 
-  // console.log(user.id);
-
+  // Get logs for the logged-in user
   const getUserLogs = async () => {
     try {
       const records = await pb.collection("logs").getFullList({
         filter: `created_by="${user.id}"`,
-        sort: "-date",
+        sort: "-created",
         expand: "created_by",
       });
       setUserLogs(records);
@@ -25,6 +25,7 @@ export default function DashboardPage() {
     }
   };
 
+  // Function for getting a group member's logs
   const getLogs = async (userID) => {
     try {
       const records = await pb.collection("logs").getFullList({
@@ -32,7 +33,7 @@ export default function DashboardPage() {
         sort: "-created",
         expand: "created_by",
       });
-      console.log('here are the stupid records:', records);
+      console.log("here are the stupid records:", records);
       return records;
     } catch (error) {
       console.error("Error fetching logs:", error);
@@ -40,35 +41,7 @@ export default function DashboardPage() {
     return [];
   };
 
-  // const getGroupLogs = async () => {
-  //   try {
-  //     const groups = (await pb.collection("group_members").getFullList({
-  //       filter: `member="${user.id}"`,
-  //       expand: 'member',
-  //       sort: "-created",
-  //     })).map(group => group.group_joined)
-
-  //     // const group_IDs = groups.map(group => group.group_joined)
-  //     console.log('here are the group IDs:', groups)
-
-  //     const group_members = (await pb.collection("group_members").getFullList({
-  //       filter: groups.map(id => `group_joined="${id}"`).join('||'),
-  //       expand: 'group_joined',
-  //     })).map(member => member.member)
-  //     console.log(group_members)
-
-  //     group_members.forEach(member => {
-  //       const memberLogs = getLogs(member)
-  //       console.log(memberLogs)
-  //       // setUserLogs(prevLogs => [...prevLogs, memberLogs])
-  //     })
-
-  //     // console.log(userLogs)
-  //   } catch (error) {
-  //     console.error("Error fetching logs:", error)
-  //   }
-  // }
-
+  // Show Logs for All Groups the user is in
   const getGroupLogs = async () => {
     try {
       const groups = (
@@ -113,10 +86,82 @@ export default function DashboardPage() {
     }
   };
 
+  // Filter logs from the past seven days for week graph
+  const fetchData = async () => {
+    try {
+      // Get dates for the past week
+      const getDates = () => {
+        const currentDate = new Date();
+        let pastWeekDates = [];
+
+        for (let i = 0; i < 7; i++) {
+          const pastDate = new Date(currentDate);
+          pastDate.setDate(currentDate.getDate() - i);
+          pastWeekDates.push(pastDate.toLocaleDateString('en-CA'));
+        }
+
+        return pastWeekDates;
+      };
+
+      // Set date order for graph
+      const graphDates = getDates().reverse();
+
+      const createDateObject = (datesArray) => {
+        const dateObject = {};
+
+        datesArray.forEach((dateString) => {
+          dateObject[dateString] = 0;
+        });
+
+        return dateObject;
+      };
+
+      let dateObject = createDateObject(graphDates);
+
+      // Set query date
+      const queryDate = new Date();
+      queryDate.setDate(queryDate.getDate() - 6);
+      const formattedQueryDate = queryDate.toLocaleDateString('en-CA');
+      console.log('formattedQueryDate:', formattedQueryDate)
+
+      const records = userLogs.filter((log) => log.date >= formattedQueryDate);
+
+      // Sum time for each day
+      records.forEach((log) => {
+        const date = log.date.slice(0, 10);
+        if (dateObject[date] !== undefined) {
+          dateObject[date] += log.duration;
+        } else {
+          console.log("No matching date found in dateObject for:", date);
+        }
+      });
+
+      // Convert sums to graph format
+      const convertedData = Object.entries(dateObject).map(
+        ([date, duration]) => ({
+          x: date,
+          y: duration,
+        })
+      );
+
+      setGraphData(convertedData);
+    } catch (error) {
+      console.error("Error fetching graph data:", error);
+    }
+  };
 
   useEffect(() => {
     getUserLogs();
   }, []);
+
+  useEffect(() => {
+    fetchData();
+    console.log("here is the use effect data", graphData);
+  }, [userLogs]);
+
+  useEffect(() => {
+    console.log("here is the use effect data", graphData);
+  }, [graphData]);
 
   const refreshUserLogs = () => {
     getUserLogs();
@@ -222,7 +267,7 @@ export default function DashboardPage() {
                 <div id="left-column-wrapper">
                   <div id="left-column">
                     {/* <div className="test-space"></div> */}
-                    <MyResponsiveLine />
+                    <MyResponsiveLine graphData={graphData} />
                   </div>
                 </div>
                 <div id="right-column-wrapper">
@@ -272,23 +317,43 @@ export default function DashboardPage() {
                                   <h2 className="card-title text-utility-color-2 inter-bold mb-1">
                                     {log.activity}
                                   </h2>
-                                  <div className="grid grid-cols-3 justify-bewteen text-utility-color-3 font-semibold">
-                                    <div className="flex flex-row gap-x-1 justify-start">
-                                      <img className="w-5" src="/clock.svg" />
-                                      <span>{log.duration} minutes</span>
+                                  {log.activity_type === "Reading" ? (
+                                    <div className="grid grid-cols-3 justify-bewteen text-utility-color-3 font-semibold">
+                                      <div className="flex flex-row gap-x-1 justify-start">
+                                        <img className="w-5" src="/clock.svg" />
+                                        <span>{log.word_count} words</span>
+                                      </div>
+                                      <div className="flex flex-row gap-x-1 justify-center">
+                                        <img
+                                          className="w-5"
+                                          src="/volume-1.svg"
+                                        />
+                                        <span>{log.activity_type}</span>
+                                      </div>
+                                      <div className="flex flex-row gap-x-1 justify-end">
+                                        <img className="w-5" src="/clock.svg" />
+                                        <span>{log.language}</span>
+                                      </div>
                                     </div>
-                                    <div className="flex flex-row gap-x-1 justify-center">
-                                      <img
-                                        className="w-5"
-                                        src="/volume-1.svg"
-                                      />
-                                      <span>{log.activity_type}</span>
+                                  ) : (
+                                    <div className="grid grid-cols-3 justify-bewteen text-utility-color-3 font-semibold">
+                                      <div className="flex flex-row gap-x-1 justify-start">
+                                        <img className="w-5" src="/clock.svg" />
+                                        <span>{log.duration} minutes</span>
+                                      </div>
+                                      <div className="flex flex-row gap-x-1 justify-center">
+                                        <img
+                                          className="w-5"
+                                          src="/volume-1.svg"
+                                        />
+                                        <span>{log.activity_type}</span>
+                                      </div>
+                                      <div className="flex flex-row gap-x-1 justify-end">
+                                        <img className="w-5" src="/clock.svg" />
+                                        <span>{log.language}</span>
+                                      </div>
                                     </div>
-                                    <div className="flex flex-row gap-x-1 justify-end">
-                                      <img className="w-5" src="/clock.svg" />
-                                      <span>{log.language}</span>
-                                    </div>
-                                  </div>
+                                  )}
                                 </div>
                               </div>
                             );
