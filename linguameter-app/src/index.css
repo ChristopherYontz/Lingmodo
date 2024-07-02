@@ -442,12 +442,20 @@ height: 100lvh;
               outline: 1px solid blueviolet;
             }
               #left-column {
-                height: 100%;
+                height: 85%;
                 /* background-color: chartreuse; */
                 /* outline: 1px solid chartreuse; */
                 background-color: #fff;
                 padding: 3lvh 0;
+                display: flex;
+                flex-direction: column;
               }
+
+                /* Graph styling for dashboard */
+                #left-column > :first-child {
+                  height: 40% !important;
+                }
+
             #right-column-wrapper {
               height: 100%;
               /* background-color: aquamarine; */

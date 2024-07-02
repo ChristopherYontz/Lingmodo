@@ -1,26 +1,69 @@
-export default function LogCard() {
-
+export default function LogCard({userLogs}) {
   return (
-    <div className="card-container w-[30.125rem] h-[8.75rem] shadow-lg rounded-[1rem]">
-      <div className="card-top bg-green-primary flex flex-row justify-between rounded-t-[1rem] h-2/5">
-        <div className="card-top-left">
-          <div className="img-container w-[2.688] h-[2.688]">
-            <img src='#' alt="profile-picture object-cover" />
-          </div>
-          <span>Username</span>
-        </div>
-        <div className="card-top-right">
-          <span>Date</span>
-        </div>
+      <div id="logs">
+        {userLogs.length > 0 ? (
+          userLogs.map((log) => (
+            <div key={log.id} className="card-tile">
+              <div className="card-tile-head bg-primary-color-1">
+                <div className="profile">
+                  <img
+                    className="rounded-full"
+                    src={`http://127.0.0.1:8090/api/files/users/${log.expand.created_by.id}/${log.expand.created_by.avatar}`}
+                    alt="Profile Picture"
+                  />
+                </div>
+                <div>
+                  <h4 className="text-utility-color-1 text-top inter-medium">
+                    @{log.expand.created_by.username}
+                  </h4>
+                </div>
+                <div className="spacer"></div>
+                <div className="text-utility-color-1">
+                  {log.date.slice(0, 10)}
+                </div>
+              </div>
+
+              <div className="card-tile-body bg-white">
+                <h2 className="card-title text-utility-color-2 inter-bold mb-1">
+                  {log.activity}
+                </h2>
+                {log.activity_type === "Reading" ? (
+                  <div className="grid grid-cols-3 justify-between text-utility-color-3 font-semibold">
+                    <div className="flex flex-row gap-x-1 justify-start">
+                      <img className="w-5" src="/clock.svg" alt="Clock" />
+                      <span>{log.word_count} words</span>
+                    </div>
+                    <div className="flex flex-row gap-x-1 justify-center">
+                      <img className="w-5" src="/volume-1.svg" alt="Volume" />
+                      <span>{log.activity_type}</span>
+                    </div>
+                    <div className="flex flex-row gap-x-1 justify-end">
+                      <img className="w-5" src="/clock.svg" alt="Clock" />
+                      <span>{log.language}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 justify-between text-utility-color-3 font-semibold">
+                    <div className="flex flex-row gap-x-1 justify-start">
+                      <img className="w-5" src="/clock.svg" alt="Clock" />
+                      <span>{log.duration} minutes</span>
+                    </div>
+                    <div className="flex flex-row gap-x-1 justify-center">
+                      <img className="w-5" src="/volume-1.svg" alt="Volume" />
+                      <span>{log.activity_type}</span>
+                    </div>
+                    <div className="flex flex-row gap-x-1 justify-end">
+                      <img className="w-5" src="/clock.svg" alt="Clock" />
+                      <span>{log.language}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))
+        ) : (
+          <h1>No logs found.</h1>
+        )}
       </div>
-      <div className="card-bottom bg-white rounded-b-[1rem] h-3/5">
-        <h3>Activity Name</h3>
-        <div className="activity-info flex flex-row justify-between">
-          <span>Duration</span>
-          <span>Type</span>
-          <span>Language</span>
-        </div>
-      </div>
-    </div>
   );
 }
